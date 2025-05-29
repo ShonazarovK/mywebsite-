@@ -1,118 +1,88 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Inventory
-from django.contrib.auth.decorators import login_required
 from .forms import AddInventoryForm, UpdateInventoryForm
 from django.contrib import messages
-from django_pandas.io import read_frame
-from django.db import models
-import plotly
-import plotly.express as px
-import json
+from django.contrib.auth.decorators import login_required
 import datetime
 
-
+# HomePage (home_dark)
 @login_required
 def inventory_list(request):
     inventories = Inventory.objects.all()
-    context = {
-        "title": "Inventory List",
+    return render(request, "inventory/home_dark.html", {
+        "title": "All Products",
         "inventories": inventories
-    }
-    return render(request, "inventory/inventory_list.html", context=context)
+    })
 
-
+# Product Detail Page (productdetail.html)
 @login_required
-def per_product_view(request, pk):
+def product_detail(request, pk):
     inventory = get_object_or_404(Inventory, pk=pk)
-    context = {
+    return render(request, "inventory/productdetail.html", {
         "inventory": inventory,
-        "title": "Product View"
-    }
+        "title": "Product Details"
+    })
 
-    return render(request, "inventory/per_product.html", context=context)
-
-
+# Add Product Page (add.html)
 @login_required
 def add_product(request):
     if request.method == "POST":
-        add_form = AddInventoryForm(data=request.POST)
-        if add_form.is_valid():
-            new_inventory = add_form.save(commit=False)
-            new_inventory.sales = float(add_form.data['cost_per_item']) * float(add_form.data['quantity_sold'])
-            new_inventory.save()
-            messages.success(request, "Successfully added product!")
-            return redirect("/inventory/")
+        form = AddInventoryForm(request.POST)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.sales = float(product.cost_per_item) * float(product.quantity_sold)
+            product.save()
+            messages.success(request, "Product added successfully!")
+            return redirect('inventory_list')
     else:
-        add_form = AddInventoryForm()
-    return render(request, "inventory/inventory_add.html", {"form": add_form, "title": "Manage Inventory"})
+        form = AddInventoryForm()
+    return render(request, "inventory/add.html", {
+        "form": form,
+        "title": "Add New Product"
+    })
 
-
+# Update Product (per_product.html)
 @login_required
-def delete_inventory(request, pk):
-    inventory = get_object_or_404(Inventory, pk=pk)
-    inventory.delete()
-    messages.warning(request, "Successfully deleted product!")
-    return redirect("/inventory/")
-
-
-@login_required
-def update_inventory(request, pk):
+def update_product(request, pk):
     inventory = get_object_or_404(Inventory, pk=pk)
     if request.method == "POST":
-        updateForm = UpdateInventoryForm(data=request.POST)
-        if updateForm.is_valid():
-            inventory.quantity_in_stock = updateForm.data['quantity_in_stock']
-            inventory.quantity_sold = updateForm.data['quantity_sold']
-            inventory.cost_per_item = updateForm.data['cost_per_item']
-            inventory.sales = float(inventory.cost_per_item) * float(inventory.quantity_sold)
-            inventory.last_sales_date = models.DateField(default=datetime.date.today)
-            inventory.save()
-            messages.success(request, "Inventory updated!")
-            return redirect(f"/inventory/per_product/{pk}")
+        form = UpdateInventoryForm(request.POST, instance=inventory)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.sales = float(product.cost_per_item) * float(product.quantity_sold)
+            product.last_sales_date = datetime.date.today()
+            product.save()
+            messages.success(request, "Product updated successfully!")
+            return redirect("product_detail", pk=pk)
     else:
-        updateForm = UpdateInventoryForm(instance=inventory)
+        form = UpdateInventoryForm(instance=inventory)
+    return render(request, "inventory/per_product.html", {
+        "form": form,
+        "inventory": inventory,
+        "title": "Update Product"
+    })
 
-    context = {"form": updateForm, "product_name": inventory.name}
-    return render(request, "inventory/inventory_update.html", context=context)
+# Delete
+@login_required
+def delete_product(request, pk):
+    inventory = get_object_or_404(Inventory, pk=pk)
+    inventory.delete()
+    messages.warning(request, "Product deleted successfully!")
+    return redirect("inventory_list")
 
-
+# Dashboard Page (dashboard.html)
 @login_required
 def dashboard(request):
     inventories = Inventory.objects.all()
+    total_stock = sum(i.quantity_in_stock for i in inventories)
+    total_sales = sum(i.sales for i in inventories)
+    low_stock = len([i for i in inventories if i.quantity_in_stock < 50])
+    categories = set(i.category for i in inventories)
 
-    df = read_frame(inventories)
-
-    sales_graph = df.groupby(by="last_sales_date", as_index=False, sort=True)['sales'].sum()
-    sales_graph = px.line(sales_graph, x=sales_graph.last_sales_date,
-                          y=sales_graph.sales,
-                          title="Sales Trend").update_layout(xaxis_title="Sales",
-                                                             yaxis_title="Quantity Sold",
-                                                             title_x=0.5,
-                                                             xaxis=dict(tickformat="%d/%m/%y", tickmode='linear'))
-    sales_graph = json.dumps(sales_graph, cls=plotly.utils.PlotlyJSONEncoder)
-
-    best_performing_product_df = df.groupby(by="name").sum().sort_values(by="quantity_sold")
-    best_performing_product = px.bar(best_performing_product_df,
-                                     x=best_performing_product_df.index,
-                                     y=best_performing_product_df.quantity_sold,
-                                     title="Best Performing Product").update_layout(xaxis_title="Product name",
-                                                                                    yaxis_title="Quantity Sold",
-                                                                                    title_x=0.5)
-    best_performing_product = json.dumps(best_performing_product, cls=plotly.utils.PlotlyJSONEncoder)
-
-    most_product_in_stock_df = df.groupby(by="name").sum().sort_values(by="quantity_in_stock")
-    most_product_in_stock = px.pie(most_product_in_stock_df,
-                                   names=most_product_in_stock_df.index,
-                                   values=most_product_in_stock_df.quantity_in_stock,
-                                   title="Product Stock overview").update_layout(xaxis_title="Product name",
-                                                                                 yaxis_title="Quantity In Stock",
-                                                                                 title_x=0.5)
-    most_product_in_stock = json.dumps(most_product_in_stock, cls=plotly.utils.PlotlyJSONEncoder)
-
-    context = {
-        "sales_graph": sales_graph,
-        "best_performing_product": best_performing_product,
-        "most_product_in_stock": most_product_in_stock,
-        "title": "Product Dashboard"
-    }
-    return render(request, "inventory/dashboard.html", context=context)
+    return render(request, "inventory/dashboard.html", {
+        "title": "Dashboard",
+        "total_stock": total_stock,
+        "total_sales": total_sales,
+        "low_stock": low_stock,
+        "category_count": len(categories)
+    })

@@ -1,39 +1,83 @@
-{% extends "../layout.html" %}
+{% extends "layout.html" %}
 {% block content %}
-    <div class="content-section">
-        <div class="row mx-auto justify-content-center">
+<style>
+    body {
+        background-color: #0f172a;
+        color: #f8fafc;
+    }
 
-            <div class="card m-4" style="width: 90%;">
-                <div class="card-body">
-                    <div id="chart1"></div>
-                </div>
-            </div>
+    .dashboard-container {
+        background-color: #1e293b;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    }
 
-             <div class="card m-4" style="width: 90%;">
-                <div class="card-body">
-                    <div id="chart2"></div>
-                </div>
-            </div>
+    .dashboard-title {
+        text-align: center;
+        color: #38bdf8;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
 
-            <div class="card m-4" style="width: 90%;">
-                <div class="card-body">
-                    <div id="chart3"></div>
-                </div>
-            </div>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
 
+    .stat-card {
+        background-color: #0f172a;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        transition: 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: scale(1.03);
+    }
+
+    .stat-label {
+        color: #94a3b8;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #f1f5f9;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="container dashboard-container">
+    <div class="dashboard-title">Inventory Dashboard</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Stock</div>
+            <div class="stat-value">{{ total_stock }}</div>
         </div>
-
+        <div class="stat-card">
+            <div class="stat-label">Total Sales</div>
+            <div class="stat-value">$ {{ total_sales }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Low Stock Items</div>
+            <div class="stat-value">{{ low_stock }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Categories</div>
+            <div class="stat-value">{{ category_count }}</div>
+        </div>
     </div>
-
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript">
-        var graph1 = {{ sales_graph| safe }}
-        Plotly.plot("chart1", graph1, {})
-
-        var graph2 = {{ best_performing_product| safe }}
-        Plotly.plot("chart2", graph2, {})
-
-        var graph3 = {{ most_product_in_stock| safe }}
-        Plotly.plot("chart3", graph3, {})
-    </script>
+</div>
 {% endblock %}

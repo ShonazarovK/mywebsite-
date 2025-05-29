@@ -1,79 +1,130 @@
-{% extends "../layout.html" %}
+{% extends "layout.html" %}
 {% block content %}
-    <div class="content-section">
-        <div class="row mx-auto justify-content-center">
+<style>
+    .product-wrapper {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 3rem;
+        border-radius: 12px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        margin-top: 2rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="cart-title text-center">Product Name</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-shopping-cart"></i></span>
-                    </div>
-                    <h3 class="text-center">{{ inventory.name }}</h3>
-                </div>
-            </div>
+    .product-header {
+        font-size: 2.2rem;
+        color: #38bdf8;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 2.5rem;
+        border-bottom: 2px solid #334155;
+        padding-bottom: 1rem;
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="cart-title text-center">Quantity in Stock</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-archive"></i></span>
-                    </div>
-                    <h3 class="text-center">{{ inventory.quantity_in_stock }}</h3>
-                </div>
-            </div>
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="cart-title text-center">Quantity sold</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-check"></i></span>
-                    </div>
-                    <h3 class="text-center">{{ inventory.quantity_sold }}</h3>
-                </div>
-            </div>
+    .product-box {
+        background: #1e293b;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="cart-title text-center">Unit Price</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-usd"></i></span>
-                    </div>
-                    <h3 class="text-center"><sup>$</sup>{{ inventory.cost_per_item }}</h3>
-                </div>
-            </div>
+    .product-box:hover {
+        background: #334155;
+        transform: scale(1.03);
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Sales Amount</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-usd"></i></span>
-                    </div>
-                    <h3 class="text-center"><sup>$</sup>{{ inventory.sales }}</h3>
-                </div>
-            </div>
+    .product-box h6 {
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.3rem;
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="cart-title text-center">Stock Date</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-calendar"></i></span>
-                    </div>
-                    <h3 class="text-center">{{ inventory.stock_date }}</h3>
-                </div>
-            </div>
+    .product-box p {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #e2e8f0;
+    }
 
-            <div class="card m-4" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="cart-title text-center">Last Sales Date</h5>
-                    <div style="font-size: 30px;" class="text-center">
-                        <span><i class="icon-calendar"></i></span>
-                    </div>
-                    <h3 class="text-center">{{ inventory.last_sales_date }}</h3>
-                </div>
-            </div>
-            <a class="btn btn-outline-success btn-sm mb-3" href="{% url 'update_inventory' inventory.id %}">Update Inventory</a>
-            <a class="btn btn-danger btn-sm" href="{% url 'delete_inventory' inventory.id %}">Delete Inventory</a>
+    .action-buttons {
+        margin-top: 2.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1.2rem;
+    }
+
+    .action-buttons a {
+        padding: 0.7rem 1.4rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .btn-update {
+        background: #0ea5e9;
+        color: #0f172a;
+    }
+
+    .btn-update:hover {
+        background: #38bdf8;
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #dc2626;
+    }
+</style>
+
+<div class="container product-wrapper">
+    <div class="product-header">Product Details</div>
+    <div class="product-grid">
+        <div class="product-box">
+            <h6>Product Name</h6>
+            <p>{{ inventory.name }}</p>
+        </div>
+        <div class="product-box">
+            <h6>In Stock</h6>
+            <p>{{ inventory.quantity_in_stock }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Sold</h6>
+            <p>{{ inventory.quantity_sold }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Unit Price</h6>
+            <p>$ {{ inventory.cost_per_item }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Total Sales</h6>
+            <p>$ {{ inventory.sales }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Stock Date</h6>
+            <p>{{ inventory.created|date:"F d, Y" }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Last Sales Date</h6>
+            <p>{{ inventory.last_sales_date|date:"F d, Y" }}</p>
         </div>
     </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'update_inventory' inventory.pk %}" class="btn-update">Update</a>
+        <a href="{% url 'delete_inventory' inventory.pk %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,9 +1,47 @@
-{% extends "../layout.html" %}
-{% load static %}
+{% extends "layout.html" %}
 {% block content %}
-<div class="content-section">
-    <small class="text-muted">
-        You have been logged out. <a href="{% url 'login' %}">Login again</a>
-    </small>
+<style>
+    .logout-wrapper {
+        background-color: #1e293b;
+        color: #f8fafc;
+        padding: 3rem;
+        margin-top: 3rem;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.4);
+    }
+
+    .logout-wrapper h2 {
+        color: #38bdf8;
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .logout-wrapper p {
+        font-size: 1.2rem;
+        color: #94a3b8;
+    }
+
+    .logout-wrapper a {
+        margin-top: 2rem;
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #38bdf8;
+        color: #0f172a;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+
+    .logout-wrapper a:hover {
+        background-color: #0ea5e9;
+    }
+</style>
+
+<div class="container logout-wrapper">
+    <h2>You have been logged out</h2>
+    <p>Thank you for using the WMS system.</p>
+    <a href="{% url 'login' %}">Log in again</a>
 </div>
 {% endblock %}
