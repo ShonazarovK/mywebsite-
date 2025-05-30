@@ -16,41 +16,40 @@
         color: #38bdf8;
         text-align: center;
         font-weight: bold;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         border-bottom: 2px solid #334155;
         padding-bottom: 1rem;
     }
 
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        background-color: #1e293b;
+        border-radius: 12px;
+        overflow: hidden;
     }
 
-    .product-box {
-        background: #1e293b;
-        padding: 1.5rem;
-        border-radius: 10px;
-        text-align: center;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .product-box:hover {
-        background: #334155;
-        transform: scale(1.03);
-    }
-
-    .product-box h6 {
-        color: #94a3b8;
-        font-weight: 600;
-        font-size: 0.95rem;
-        margin-bottom: 0.3rem;
-    }
-
-    .product-box p {
-        font-size: 1.2rem;
-        font-weight: 700;
+    th, td {
+        padding: 1.2rem;
+        text-align: left;
         color: #e2e8f0;
+    }
+
+    th {
+        background-color: #334155;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #94a3b8;
+        width: 25%;
+    }
+
+    tr:nth-child(even) {
+        background-color: #273447;
+    }
+
+    tr:hover {
+        background-color: #3b475a;
     }
 
     .action-buttons {
@@ -91,36 +90,41 @@
 
 <div class="container product-wrapper">
     <div class="product-header">Product Details</div>
-    <div class="product-grid">
-        <div class="product-box">
-            <h6>Product Name</h6>
-            <p>{{ inventory.name }}</p>
-        </div>
-        <div class="product-box">
-            <h6>In Stock</h6>
-            <p>{{ inventory.quantity_in_stock }}</p>
-        </div>
-        <div class="product-box">
-            <h6>Sold</h6>
-            <p>{{ inventory.quantity_sold }}</p>
-        </div>
-        <div class="product-box">
-            <h6>Unit Price</h6>
-            <p>$ {{ inventory.cost_per_item }}</p>
-        </div>
-        <div class="product-box">
-            <h6>Total Sales</h6>
-            <p>$ {{ inventory.sales }}</p>
-        </div>
-        <div class="product-box">
-            <h6>Stock Date</h6>
-            <p>{{ inventory.created|date:"F d, Y" }}</p>
-        </div>
-        <div class="product-box">
-            <h6>Last Sales Date</h6>
-            <p>{{ inventory.last_sales_date|date:"F d, Y" }}</p>
-        </div>
-    </div>
+
+    <table>
+        <tr>
+            <th>Product Name</th>
+            <td>{{ inventory.name }}</td>
+        </tr>
+        <tr>
+            <th>Category</th>
+            <td>{{ inventory.category|default:"—" }}</td>
+        </tr>
+        <tr>
+            <th>In Stock</th>
+            <td>{{ inventory.quantity_in_stock }}</td>
+        </tr>
+        <tr>
+            <th>Sold</th>
+            <td>{{ inventory.quantity_sold }}</td>
+        </tr>
+        <tr>
+            <th>Unit Price</th>
+            <td>$ {{ inventory.cost_per_item }}</td>
+        </tr>
+        <tr>
+            <th>Total Sales</th>
+            <td>$ {{ inventory.sales }}</td>
+        </tr>
+        <tr>
+            <th>Stock Date</th>
+            <td>{{ inventory.stock_date|date:"F d, Y" }}</td>
+        </tr>
+        <tr>
+            <th>Last Sales Date</th>
+            <td>{{ inventory.last_sales_date|date:"F d, Y" }}</td>
+        </tr>
+    </table>
 
     <div class="action-buttons">
         <a href="{% url 'update_inventory' inventory.pk %}" class="btn-update">Update</a>

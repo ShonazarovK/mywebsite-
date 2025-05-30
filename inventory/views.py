@@ -79,10 +79,45 @@ def dashboard(request):
     low_stock = len([i for i in inventories if i.quantity_in_stock < 50])
     categories = set(i.category for i in inventories)
 
+    # Importlar
+    import plotly.graph_objs as go
+    from plotly.offline import plot
+
+    # Best Performing Product – Bar Chart
+    product_names = [i.name for i in inventories]
+    product_sales = [i.quantity_sold for i in inventories]
+    bar = go.Bar(x=product_names, y=product_sales, marker_color='royalblue')
+    bar_layout = go.Layout(
+        title='Best Performing Product',
+        xaxis=dict(title='Product name'),
+        yaxis=dict(title='Quantity sold'),
+        plot_bgcolor='#0f172a',
+        paper_bgcolor='#0f172a',
+        font=dict(color='#f8fafc')
+    )
+    best_chart_html = plot(go.Figure(data=[bar], layout=bar_layout), output_type='div')
+
+    # Product Stock Overview – Pie Chart
+    pie = go.Pie(
+        labels=product_names,
+        values=[i.quantity_in_stock for i in inventories],
+        marker=dict(colors=['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#6366f1']),
+        textinfo='percent+label'
+    )
+    pie_layout = go.Layout(
+        title='Product Stock Overview',
+        plot_bgcolor='#0f172a',
+        paper_bgcolor='#0f172a',
+        font=dict(color='#f8fafc'),
+    )
+    pie_chart_html = plot(go.Figure(data=[pie], layout=pie_layout), output_type='div')
+
     return render(request, "inventory/dashboard.html", {
         "title": "Dashboard",
         "total_stock": total_stock,
         "total_sales": total_sales,
         "low_stock": low_stock,
-        "category_count": len(categories)
+        "category_count": len(categories),
+        "best_performing_product": best_chart_html,
+        "most_product_in_stock": pie_chart_html,
     })
