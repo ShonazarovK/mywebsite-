@@ -4,11 +4,12 @@ from django.views.generic.base import RedirectView
 from .views import (
     inventory_list,
     product_detail,
-    add,
-    inventory_update,
+    add_product,  # ✅ to'g'ri nom
     delete_product,
-    dashboard
+    update_product,
+    dashboard,
 )
+
 
 urlpatterns = [
     path("", inventory_list, name='inventory_list'),
