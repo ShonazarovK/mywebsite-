@@ -1,61 +1,130 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-    .update-form-container {
-        background-color: #1e293b;
-        padding: 2rem;
+    .product-wrapper {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 3rem;
         border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        max-width: 600px;
-        margin: 2rem auto;
-        color: #f1f5f9;
+        box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        margin-top: 2rem;
+        font-family: 'Segoe UI', sans-serif;
     }
 
-    .update-form-container h2 {
-        text-align: center;
-        margin-bottom: 1.5rem;
+    .product-header {
+        font-size: 2.2rem;
         color: #38bdf8;
-    }
-
-    label {
-        margin: 0.5rem 0 0.3rem;
-    }
-
-    input, select {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        border: none;
-        margin-bottom: 1rem;
-        font-size: 1rem;
-        background: #334155;
-        color: white;
-    }
-
-    button {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #38bdf8;
-        border: none;
-        border-radius: 8px;
+        text-align: center;
         font-weight: bold;
+        margin-bottom: 2.5rem;
+        border-bottom: 2px solid #334155;
+        padding-bottom: 1rem;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .product-box {
+        background: #1e293b;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .product-box:hover {
+        background: #334155;
+        transform: scale(1.03);
+    }
+
+    .product-box h6 {
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .product-box p {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #e2e8f0;
+    }
+
+    .action-buttons {
+        margin-top: 2.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1.2rem;
+    }
+
+    .action-buttons a {
+        padding: 0.7rem 1.4rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
         font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .btn-update {
+        background: #0ea5e9;
         color: #0f172a;
     }
 
-    button:hover {
-        background-color: #0ea5e9;
+    .btn-update:hover {
+        background: #38bdf8;
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #dc2626;
     }
 </style>
 
-<div class="update-form-container">
-    <h2>Update Product - {{ inventory.name }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Changes</button>
-    </form>
+<div class="container product-wrapper">
+    <div class="product-header">Product Details</div>
+    <div class="product-grid">
+        <div class="product-box">
+            <h6>Product Name</h6>
+            <p>{{ inventory.name }}</p>
+        </div>
+        <div class="product-box">
+            <h6>In Stock</h6>
+            <p>{{ inventory.quantity_in_stock }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Sold</h6>
+            <p>{{ inventory.quantity_sold }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Unit Price</h6>
+            <p>$ {{ inventory.cost_per_item }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Total Sales</h6>
+            <p>$ {{ inventory.sales }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Stock Date</h6>
+            <p>{{ inventory.created|date:"F d, Y" }}</p>
+        </div>
+        <div class="product-box">
+            <h6>Last Sales Date</h6>
+            <p>{{ inventory.last_sales_date|date:"F d, Y" }}</p>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'update_inventory' inventory.pk %}" class="btn-update">Update</a>
+        <a href="{% url 'delete_inventory' inventory.pk %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+    </div>
 </div>
 {% endblock %}

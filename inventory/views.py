@@ -43,7 +43,7 @@ def add_product(request):
 
 # Update Product (per_product.html)
 @login_required
-def update_product(request, pk):
+def inventory_update(request, pk):
     inventory = get_object_or_404(Inventory, pk=pk)
     if request.method == "POST":
         form = UpdateInventoryForm(request.POST, instance=inventory)
@@ -56,7 +56,7 @@ def update_product(request, pk):
             return redirect("product_detail", pk=pk)
     else:
         form = UpdateInventoryForm(instance=inventory)
-    return render(request, "inventory/per_product.html", {
+    return render(request, "inventory/inventory_update.html", {
         "form": form,
         "inventory": inventory,
         "title": "Update Product"
