@@ -3,11 +3,11 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 from .views import (
     inventory_list,
-    add_product,
+    product_detail,
+    add,
+    inventory_update,
     delete_product,
-    update_product,
-    dashboard,
-    product_detail
+    dashboard
 )
 
 urlpatterns = [
