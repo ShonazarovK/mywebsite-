@@ -20,10 +20,9 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-    path('', inventory_list, name='inventory_list'),
-    path('add/', add_inventory, name='add_inventory'),
-    path('dashboard/', dashboard, name='dashboard'),
-    path('product/<int:id>/', product_detail, name='product_detail'),
-    path('update/<int:id>/', inventory_update, name="inventory_update"),
-    path('delete/<int:id>/', delete_inventory, name='delete_inventory'),
+    path('admin/', admin.site.urls),
+    path('inventory/', include("inventory.urls")),
+    path("", auth_views.LoginView.as_view(template_name="inventory_system/login.html"), name="login"),
+    path("logout/", auth_views.LogoutView.as_view(template_name="inventory_system/logout.html"), name="logout"),
+    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('img/favicon.ico')))
 ]
