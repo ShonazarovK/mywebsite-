@@ -80,13 +80,6 @@
       padding: 2rem;
     }
 
-    .page-title {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid #334155;
-      padding-bottom: 0.5rem;
-    }
-
     .alert {
       padding: 1rem;
       border-radius: 10px;
@@ -114,12 +107,11 @@
       <a href="{% url 'logout' %}">Logout</a>
     </div>
     <div class="nav-icon">
-      <i class="fas fa-user-circle"></i> <!-- Bu yerda istalgan ikon bo'lishi mumkin -->
+      <i class="fas fa-user-circle"></i>
     </div>
   </nav>
 
   <main class="main-container">
-    <h1 class="page-title">{{ title }}</h1>
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">{{ message }}</div>
